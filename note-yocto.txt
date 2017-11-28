@@ -1,0 +1,226 @@
+1. 准备主机运行环境
+
+Git 1.7.8 or greater
+Tar 1.24 or greater
+Python 2.7.3 or greater 
+
+$ sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-
+multilib build-essential chrpath socat libsdl1.2-dev xterm make
+xsltproc docbook-utils fop dblatex xmlto autoconf automake libtool
+libglib2.0-dev python-gtk2 bsdmainutils screen
+
+2. clone yocto src
+
+$ sudo install -o $(id -u) -g $(id -g) -d /opt/yocto
+$ cd /opt/yocto
+b
+$ git clone --branch dizzy git://git.yoctoproject.org/poky
+
+        meta : This directory contains the OpenEmbedded-Core metadata, which supports
+        the ARM, x86, x86-64, PowerPC, MIPS, and MIPS64 architectures and the QEMU
+        emulated hardware.
+        meta-yocto : This contains Poky's distribution-specific metadata.
+        meta-yocto-bsp : This contains metadata for the reference hardware boards
+
+3. Preparing the build environment
+
+$ cd /opt/yocto/poky
+$ source oe-init-build-env qemuarm
+
+4. 查看支持的生成镜像
+
+$ cd /opt/yocto/poky
+$ ls meta*/recipes*/images/*.bb
+
+5. 生成镜像
+
+$ MACHINE=qemuarm bitbake core-image-minimal
+
+
+    conf/bblayers.conf : This file is used to find all the configured layers
+
+    conf/layer.conf : This file is used on each configured layer
+
+    meta/conf/bitbake.conf : This file is used for its own configuration
+
+    conf/local.conf : This file is used for any other configuration the user may have
+                      for the current build
+
+    conf/machine/<machine>.conf : This file is the machine configuration; in our
+                      case, this is qemuarm.conf
+
+    conf/distro/<distro>.conf : This file is thebb distribution policy; by default, this is
+                                the poky.conf file
+
+6 Hob 配置工具（最新版的yocto换为 toaster）
+
+7. Metadata
+    configration   .conf
+    class          .bbclass
+    recipess       .bb .bbappend
+     
+    The recipes and classes are written in a mix of Python and shell scripting code.
+
+
+8. Bitbake 
+    bitbake <recipe> -c listtasks
+
+    Extending tasks
+
+    do_install_append() {
+        # Do my commands
+    }
+b
+8.1 Bitbake execution
+Parsing metadata
+    1) build/conf/bblayers.conf
+    2) layer/conf/layer.conf
+    3) meta/conf/bitbake.conf
+    4) using INHERIT
+    5) using BBFILES construct a list of recipes to parse along with any append files
+    
+    after the completion of a recipe bitbake has:
+
+    a list of tasks that the recipe has defined
+    a set of data consisting of keys and values
+    dependency information of the task s
+
+8.2 Preparing tasklist
+
+    PROVIDES set defaults to the recipe name
+    PRREFERED_PROVIDER_foo
+
+    *.bb
+
+    DEPENDS keep the dependencies that package needs to build succ
+    RDEPENDS  keep the dependencies that package needs to run succ
+
+    layer/conf/layer.conf
+
+    BBPATH locate configuration file under conf/ and class files under class/
+    BBFILES find recipe files (.bb and .bbappend)
+
+8.3 Executing tasks
+    shell or python
+
+    shell tasks:
+        is created under a temp directory as run.do_taskname.pid, and then it is exec
+        output from the task at the same dirctory with log.do_taskname.pid
+
+9. Generating a root filesystem image
+    by subtask do_rootfs
+
+    PACKAGE_EXCLUDE
+    IMAGE_INSTALL
+    IMAGE_FEATURES
+    IMAGE_FSTYPES
+
+10. 
+
+    bitbake-layers show-layers
+
+11. layers
+
+ http://git.yoctoproject.org/
+ http://layers.openembedded.org
+
+    there are two types layers
+    general layers
+    bsp layers
+
+11.1 Packagegroups
+
+    
+
+12. Creating Custom Layers
+    ./poky/scripts/yocto-layer create newlayer
+
+13. Creating an image
+    CORE_IMAGE_EXTRA_INSTALL
+    IMAGE_FEATURES
+
+14. Understanding the scope
+
+build/conf/local.conf
+<layer>/conf/machines/<machine>.conf
+<layer>/conf/distro/<distro>.conf
+
+15. Customizing Existing Recipes
+
+<original-layer>/recipes-core/app/app_1.0.bb
+         <layer>/recipes-core/app/app_1.0.bbappend
+
+15.1 Creating the helloworld recipe
+    yocto-layer create testone
+    
+    ( source oe-init-build-env build-tt )
+
+    bitbake helloworld
+
+WORKDIR = "${BASE_WORKDIR}/${MULTIMACH_TARGET_SYS}/${PN}/${EXTENDPE}${PV}-${PR}"
+
+15.2 Tasks
+
+bitbake -c listtasks helloworld
+
+bitbake -c fetch helloworld
+
+15.3 Deploying helloworld
+    Manually installing a package
+        # opkg install helloworld_0.1-r0_cortexa8hf-vfp-neon.ipk
+
+    Making an image dependent on our package
+    we need to add helloworld to <> in our local.conf or auto.conf
+
+        CORE_EXTRA_IMAGE_INSTALL += "helloworld"
+
+16. Applying a patch
+
+FILESEXTRAPATHS
+
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
+SRC_URI += "file://mypatch.patch"
+
+17. Adding extra files to the existing packages
+
+FILESEXTRAPATHS
+
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
+SRC_URI += "file://newconfigfile.conf"
+
+do_install_append() {
+    install -m 644 ${WORKDIR}/newconfig.conf ${D}${sysconfdir}
+}
+
+18. Customizing BusyBox
+<layer>/recipes-core/busybox/busybox_1.22.1.bbappend
+
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+SRC_URI += "file://enable-tftpd.cfg"
+
+<layer>/recipes-core/busybox/busybox/enable-tftpd.cfg
+
+CONFIG_TFTPD=y
+CONFIG_TFTPD=n
+
+19. Customizing the linux-yocto framework
+
+<layer>/recipes-kernel/linux/linux-yocto_3.14.bbappend 
+
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+SRC_URI += "file://enable-can.cfg
+
+<layer>/recipes-kernel/linux/linux-yocto/linux-yocto/enable-can.cfg
+
+CONFIG_CAN=y
+
+
+Using SDK
+
+make menucondfig
+
+
+Using BitBake
+
+$: bitbake virtual/kernel -c menuconfig
+$: bitbake virtual/kernel -c savedefconfig
