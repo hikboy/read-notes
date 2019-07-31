@@ -1,0 +1,33 @@
+^      
+// The beginning of a line;
+// When in [], and immediately followed [, means: matches a character that's not in the class.
+
+$
+// The end of a line
+
+[]     
+// Consider character classes as their own mini language
+
+-      
+// A dash is a metacharacter only within a character class [] or [^], but not at the beginning of the class, means: range
+
+examples:
+[0-9]
+[a-z]
+[A-Z]
+[0-9a-fA-F]
+[0-9A-Z_!.?] 
+// Only two dashes are special. . and ? are normal character witn in class
+
+[^]    
+// Negated character classes:  the class matches any character that isn¡¯t listed 
+
+.
+// This is a shorthand for a character class that matches any character 
+// It can be convenient when you want to have an ¡°any character here¡± placeholder in your expression.
+// The dots are not metacharacters when they are within a character class. 
+
+|
+//means or
+//It allows you to combine multiple expressions into a single expression
+//Within a class, the | character is just a normal character 
