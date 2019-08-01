@@ -31,3 +31,13 @@ examples:
 //means or
 //It allows you to combine multiple expressions into a single expression
 //Within a class, the | character is just a normal character 
+
+//Thess metasequences match the position at the start and end of a word (alphanumeric characters);
+//Remember, not all versions of egr ep support these word-boundary metacharacters;
+\< //match word starting
+
+\> //match word ending
+
+()
+//Used to limit scope of | ;
+//
