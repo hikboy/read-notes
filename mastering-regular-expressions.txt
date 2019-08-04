@@ -1,3 +1,4 @@
+//Position
 ^      
 // The beginning of a line;
 // When in [], and immediately followed [, means: matches a character that's not in the class.
@@ -41,3 +42,9 @@ examples:
 ()
 //Used to limit scope of | ;
 //
+
+//Quanfitiers always work with the smallest immediately-preceding subexpression
+*
++
+?
+
