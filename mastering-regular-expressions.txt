@@ -48,3 +48,17 @@ examples:
 +
 ?
 
+Of course, you can have more than one set of parentheses in a regular expression.
+Use !\1" , !\2" , !\3" , etc., to refer to the first, second, third, etc. sets.
+(?
+(?:) #group but do not capture
+
+#positive lookahead and lookbehind
+(?=) #lookahead  peeks forward in the text (toward the right) 
+     #to see if its subexpression can match, and is successful 
+     #as a regex component if it can.
+(?<=) #lookbehind which looks back (toward the left)
+
+#negative lookahead and lookbehind
+(?!) #successful if can not match to the right
+(?<!) #successful if can not match to the left
